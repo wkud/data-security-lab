@@ -41,4 +41,5 @@ def show(q):
     print("Mnozenie")
     print_table(mul(q), q, '* ')
     
-[show(q) for q in [8, 16]]
+if __name__ == "__main__":
+    [show(q) for q in [8, 16]]
