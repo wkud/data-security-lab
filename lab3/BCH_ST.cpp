@@ -18,9 +18,31 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define	n	15		/* dlugosc slowa kodowego		*/
-#define	r	8		/* stopien wielomianu generujacego kod	*/
-#define	d	5		/* minimalna odleglosc miedzy slowami	*/
+// 1
+//#define	n	7		/* dlugosc slowa kodowego		*/
+//#define	r	3		/* stopien wielomianu generujacego kod	*/
+//#define	d	3		/* minimalna odleglosc miedzy slowami	*/
+//int	wg[r + 1] = { 1, 0,1,1 }; // 1 3
+
+// 2
+//#define	n	15		/* dlugosc slowa kodowego		*/
+//#define	r	8		/* stopien wielomianu generujacego kod	*/
+//#define	d	5		/* minimalna odleglosc miedzy slowami	*/
+//int	wg[r + 1] = { 1,1,1, 0,1,0, 0,0,1 };
+
+// 3
+//#define	n	31		/* dlugosc slowa kodowego		*/
+//#define	r	10		/* stopien wielomianu generujacego kod	*/
+//#define	d	5		/* minimalna odleglosc miedzy slowami	*/
+//int	wg[r + 1] = { 1,1, 1,0,1, 1,0,1, 0,0,1 }; // 3 5 5 1
+
+// 4
+#define	n	51		/* dlugosc slowa kodowego		*/
+#define	r	27		/* stopien wielomianu generujacego kod	*/
+#define	d	10		/* minimalna odleglosc miedzy slowami	*/
+int	wg[r + 1] = { 1, 1,1,1, 1,1,0, 0,1,0, 1,1,1, 1,1,1, 1,1,0, 1,0,0, 1,1,1, 1,1,1 }; // 1 7 6 2 7 7 6 4 7 7
+
+
 
 /* wielomian generujucy kod     n = 31;   k = 21;   r = 10   d = 5 */
 
@@ -31,13 +53,13 @@
 
 // inne kody cykliczne         n = 7;    k = 4;    r = 3;   d = 3
 
-// int	wg[r+1] = {1,0, 1,1};     
-     	        //   1    3    
+// int	wg[r+1] = {1,0, 1,1};
+     	        //   1    3
 // wg[0] - wspolczynnik przy najwyzszej potedze
 
 // inne kody cykliczne    n = 15;    k = 7;    r = 8;   d = 5
 
- int	wg[r + 1] = { 1,1,1, 0,1,0, 0,0,1 };     
+//int	wg[r + 1] = { 1,1,1, 0,1,0, 0,0,1 };
 			  //        7      2      1
 // wg[0] - wspolczynnik przy najwyzszej potedze
 
@@ -54,8 +76,30 @@ void Calculate_Syndrom(int slowo[], int syndrom[])
 	//  slowo[0],  wg[0]   - wspolczynniki przy najwyzszej potedze wielomianow
 	// np. slowo[n] = {1,0,0,0,0,0,0}  wg[r+1] = { 1,0,1,1 }    syndrom[] = {1, 0, 1} = (slowo) mod (wg) reszta z dzielenia
 
-	// wstawic obliczanie syndromu 
+	// wstawic obliczanie syndromu
 
+    int temp[n];
+    for (int i = 0; i < n; i++)
+        temp[i] = slowo[i];
+
+    for (int i = 0; i < n; i++)
+    {
+        if(temp[i] == 0)
+            continue;
+
+        for (int j = 0; j < r+1; j++)
+        {
+            if (i+(r+1) > n)
+                break;
+
+            temp[i+j] = temp[i+j]^wg[j];
+        }
+    }
+
+    for (int i = 1; i < (r+1); i++)
+    {
+        syndrom[(r+1)-i-1] = temp[n-i];
+    }
 
 }
 
@@ -65,7 +109,7 @@ int main()
 	int	F3[r];	/* elementy syndromu 	*/
 
 	int	waga, h = 0, i, j, k;
-	char	message[256] = "", error[256] = ""; 
+	char	message[256] = "", error[256] = "";
 
 	for (i = 0; i < 255; i++) { message[i] = 0;   error[i] = 0; }
 
@@ -73,10 +117,10 @@ int main()
 	printf("                                                 ");
 	for (i = 0; i < n - r; i++) printf("_");
 	printf("\nPodaj ciag do wyslania (%3d znakow '0' lub '1'): ", n - r);
-	
-	std::cin >> message; 
 
-		
+	std::cin >> message;
+
+
 	//scanf("%s", message);
 	// fflush(stdin);
 
@@ -93,11 +137,11 @@ int main()
 	for (i = n - r; i < n; i++)
 		F2[i] = 0;					// dopisz zera na pozycjach kontrolnych
 
-	Calculate_Syndrom(F2, F3);    // oblicz resztę F3(x) = F2(x) mod wg(x) 
+	Calculate_Syndrom(F2, F3);    // oblicz resztę F3(x) = F2(x) mod wg(x)
 
-	for (i = n - r; i < n; i++)        //  dopisz (normalnie dodajemy mod 2, ale byly zera na koncu wiec wystarczy dopisac) 
+	for (i = n - r; i < n; i++)        //  dopisz (normalnie dodajemy mod 2, ale byly zera na koncu wiec wystarczy dopisac)
        F2[i] = F3[i - n + r];          //  resztę (syndrom) na koniec wektora - ostatnie r bitow to czesc kontrolna kodu
-		       
+
 
 	printf("\nZakodowany ciag (wektor kodowy  n = %d): ", n);
 	for (i = 0; i < n; i++)
@@ -110,8 +154,8 @@ int main()
 	printf("                                            ");
 	for (i = 0; i < n; i++) printf("_");
 	printf("\nPodaj blad wprowadzony do wektora kodowego: ");
-	
-	std::cin >> error; 
+
+	std::cin >> error;
 
 	//scanf_s("%s", error);
 	// fflush(stdin);
@@ -131,7 +175,7 @@ int main()
 	}
 
 	k = 0;						// zliczanie liczby bledow
-	for (i = 0; i < n; i++) 
+	for (i = 0; i < n; i++)
 		if (error[i]=='1') k++;
 
 	if (k > (d - 1) / 2)
